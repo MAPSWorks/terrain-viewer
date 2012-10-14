@@ -44,6 +44,7 @@ display()
         if(world.fill_mode == 1) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }else if(world.fill_mode == 2) {
+            glPointSize(2.0f);
             glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         }
 
