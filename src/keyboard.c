@@ -104,6 +104,7 @@ void keyboard( unsigned char key, int x, int y ) {
             if(++world.fill_mode > 2) {
                 world.fill_mode = 0;
             }
+            break;
         case 'v': // Rotate sun
             world.sun_theta += sunAngleStep;
             break;
