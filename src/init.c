@@ -118,11 +118,8 @@ void
 make_vertex(vec4 * const v, int x, int z, mapData const * const mData) {
     v->x = mData->scale * x - mData->xOffset;
 
-    GLfloat y = mData->elevationData[z][x];
-    if(y == 0.0f) {
-        //y = mData->minElevation;
-    }
-    v->y = (mData->yScale * y) - (mData->yScale * mData->minElevation);
+    GLfloat const y = mData->elevationData[z][x] - mData->minElevation;
+    v->y = mData->yScale * y;
 
     v->z = mData->scale * z - mData->zOffset;
     v->w = 1.0f;
@@ -143,20 +140,20 @@ make_vertex(vec4 * const v, int x, int z, mapData const * const mData) {
 void 
 make_normal_top(vec3 * const n, int x, int z, mapData const * const mData) {
     vec4 vertex1;
-    make_vertex(&vertex1, x+1, z+1, mData);
+    make_vertex( &vertex1, x+1, z+1, mData );
     vec4 vertex2;
-    make_vertex(&vertex2, x, z, mData);
+    make_vertex( &vertex2, x, z, mData );
     vec4 u;
-    vec4_sub(&u, &vertex1, &vertex2);
+    vec4_sub( &u, &vertex1, &vertex2 );
 
     vec4 v; 
-    make_vertex(&vertex1, x+1, z, mData);
-    make_vertex(&vertex2, x+1, z+1, mData);
-    vec4_sub(&v,&vertex1,&vertex2);
+    make_vertex( &vertex1, x+1, z, mData );
+    make_vertex( &vertex2, x+1, z+1, mData );
+    vec4_sub( &v, &vertex1, &vertex2 );
 
     vec3 c;
-    vec4_cross(&c,&u,&v);
-    vec3_norm(n, &c);
+    vec4_cross( &c, &u, &v );
+    vec3_norm( n, &c );
 }
 
 /**
@@ -176,18 +173,18 @@ make_normal_bottom(vec3 * const n, int x, int z, mapData const * const mData) {
     vec4 u;
     vec4 vertex1;
     vec4 vertex2;
-    make_vertex(&vertex1, x, z+1, mData);
-    make_vertex(&vertex2, x, z, mData);
-    vec4_sub(&u,&vertex1, &vertex2);
+    make_vertex( &vertex1, x, z+1, mData );
+    make_vertex( &vertex2, x, z, mData );
+    vec4_sub( &u, &vertex1, &vertex2 );
 
     vec4 v; 
-    make_vertex(&vertex1, x+1, z+1, mData);
-    make_vertex(&vertex2, x, z+1, mData);
-    vec4_sub(&v,&vertex1,&vertex2);
+    make_vertex( &vertex1, x+1, z+1, mData );
+    make_vertex( &vertex2, x, z+1, mData );
+    vec4_sub( &v, &vertex1, &vertex2 );
 
     vec3 c;
-    vec4_cross(&c,&u,&v);
-    vec3_norm(n,&c);
+    vec4_cross( &c, &u, &v );
+    vec3_norm( n, &c );
 }
 
 /**
