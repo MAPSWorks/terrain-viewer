@@ -6,6 +6,7 @@
 
 // Global variables defined in init.c
 extern worldData world;
+extern cameraData camera;
 
 /**
  * Callback function to handle key events
@@ -39,59 +40,59 @@ void keyboard( unsigned char key, int x, int y ) {
         case 'W': // Move forward in direction of camera face
             step /= 5.0;
         case 'w':
-            world.viewer[0] -= step * -sin(world.theta[1] * DegreesToRadians) 
-                                    * cos(world.theta[0] * DegreesToRadians); 
-            world.viewer[1] -= step * sin(world.theta[0] * DegreesToRadians); 
-            world.viewer[2] -= step * cos(world.theta[1] * DegreesToRadians) 
-                                    * cos(world.theta[0] * DegreesToRadians);
+            camera.viewer[0] -= step * -sin(camera.theta[1] * DegreesToRadians) 
+                                    * cos(camera.theta[0] * DegreesToRadians); 
+            camera.viewer[1] -= step * sin(camera.theta[0] * DegreesToRadians); 
+            camera.viewer[2] -= step * cos(camera.theta[1] * DegreesToRadians) 
+                                    * cos(camera.theta[0] * DegreesToRadians);
             break;
         case 'S': // Move backward from direction of camera face
             step /= 5.0;
         case 's':
-            world.viewer[0] += step * -sin(world.theta[1] * DegreesToRadians) 
-                                    * cos(world.theta[0] * DegreesToRadians);
-            world.viewer[1] += step * sin(world.theta[0] * DegreesToRadians); 
-            world.viewer[2] += step * cos(world.theta[1] * DegreesToRadians) 
-                                    * cos(world.theta[0] * DegreesToRadians);
+            camera.viewer[0] += step * -sin(camera.theta[1] * DegreesToRadians) 
+                                    * cos(camera.theta[0] * DegreesToRadians);
+            camera.viewer[1] += step * sin(camera.theta[0] * DegreesToRadians); 
+            camera.viewer[2] += step * cos(camera.theta[1] * DegreesToRadians) 
+                                    * cos(camera.theta[0] * DegreesToRadians);
             break;
         case 'D': // Rotate camera clockwise around y axis
             angleStep /= 5.0;
         case 'd': 
-            world.theta[1] += angleStep;
+            camera.theta[1] += angleStep;
             break;
         case 'A': // Rotate camera counter-clockwise around y axis
             angleStep /= 5.0;
         case 'a': 
-            world.theta[1] -= angleStep;
+            camera.theta[1] -= angleStep;
             break;
         case 'E': // Rotate camera up
             angleStep /= 5.0;
         case 'e':
-            world.theta[0] -= angleStep;
+            camera.theta[0] -= angleStep;
             break;
         case 'Q': // Rotate camera down
             angleStep /= 5.0;
         case 'q': 
-            world.theta[0] += angleStep;
+            camera.theta[0] += angleStep;
             break;
         // Axis Rotations (+/-)
         case 'i':  // x axis
-            world.theta[0] += angleStep;
+            camera.theta[0] += angleStep;
             break;
         case 'I':
-            world.theta[0] -= angleStep;
+            camera.theta[0] -= angleStep;
             break;
         case 'o':  // y axis
-            world.theta[1] += angleStep;
+            camera.theta[1] += angleStep;
             break;
         case 'O':
-            world.theta[1] -= angleStep;
+            camera.theta[1] -= angleStep;
             break;
         case 'p': // z axis
-            world.theta[2] += angleStep;
+            camera.theta[2] += angleStep;
             break;
         case 'P':
-            world.theta[2] -= angleStep;
+            camera.theta[2] -= angleStep;
             break;
         case 'f': // Toggle between wireframe modes
             if(world.wireframe_mode == 0) {

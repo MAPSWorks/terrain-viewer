@@ -8,21 +8,12 @@
 #include "shader.h"
 
 worldData world;
+cameraData camera;
 
 void
 init_world_data(worldData * const w) {
     // Size of the (x,z) plane to fit the map in
     w->cube_size = 100.0f;
-
-    // The location of the camera in w coordiantes
-    w->viewer[0] = 0.0f;
-    w->viewer[1] = w->cube_size / 2.5f;
-    w->viewer[2] = -w->cube_size;
-
-    // The rotation of the camera in degrees
-    w->theta[0] = 15.0f;
-    w->theta[1] = 180.0f;
-    w->theta[2] = 0.0f;
 
     // Wireframe (0=off, 1=on)
     w->wireframe_mode = 0;
@@ -42,6 +33,19 @@ init_world_data(worldData * const w) {
     vec4_init( &w->ground_material.diffuse, 1.0f, 1.0f, 1.0f, 1.0f );
     vec4_init( &w->ground_material.specular, 0.2f, 0.2f, 0.2f, 1.0f );
     w->ground_material.shininess = 30.0f;
+}
+
+void 
+init_camera_data(cameraData * const c, GLfloat cube_size) {
+    // The location of the camera in world coordiantes
+    c->viewer[0] = 0.0f;
+    c->viewer[1] = cube_size / 2.5f;
+    c->viewer[2] = -cube_size;
+
+    // The rotation of the camera in degrees
+    c->theta[0] = 15.0f;
+    c->theta[1] = 180.0f;
+    c->theta[2] = 0.0f;
 }
 
 /**
@@ -236,6 +240,7 @@ get_average_normal(vec3 * const v,
 void
 init(FILE* const file) {
     init_world_data( &world );
+    init_camera_data( &camera, world.cube_size );
 
     mapData mData;
     load_file( &mData, file, &world );
@@ -374,7 +379,7 @@ init(FILE* const file) {
             
     // Get the address of the uniform cmt used for translating
     // and rotating the object, then set the defaults
-    world.model_view_pos = glGetUniformLocation( program, "model_view" );
+    camera.model_view_pos = glGetUniformLocation( program, "model_view" );
     world.projection_pos = glGetUniformLocation( program, "projection" );
     world.wireframe_pos = glGetUniformLocation( program, "wireframe" );
     world.light_pos = glGetUniformLocation( program, "light_position" );

@@ -46,9 +46,6 @@ typedef struct {
 
 typedef struct {
     GLfloat cube_size;
-    GLfloat viewer[3];
-    GLfloat theta[3];
-    GLuint model_view_pos;
     GLuint projection_pos;
     int wireframe_mode;
     int fill_mode;
@@ -60,5 +57,13 @@ typedef struct {
     GLuint shininess_pos;
     GLuint num_vertices;
 } worldData;
+
+typedef struct {
+    GLfloat viewer[3];
+    GLfloat theta[3];
+    GLuint model_view_pos;
+    int lastMouseX;
+    int lastMouseY;
+} cameraData;
 
 #endif

@@ -9,8 +9,9 @@
 
 /* Global variables defined in init.c */
 extern worldData world;
+extern cameraData camera;
 
-static void get_model_view(mat4 r, worldData const * const w);
+static void get_model_view(mat4 r, cameraData const * const c);
 static void get_sun_position(vec4* r, mat4 mv, worldData const * const w);
 
 /**
@@ -25,8 +26,8 @@ display()
     
     // Update model view based on camera location/rotation
     mat4 mv;
-    get_model_view(mv, &world);
-    glUniformMatrix4fv(world.model_view_pos, 1, GL_TRUE, (GLfloat*) mv);
+    get_model_view(mv, &camera);
+    glUniformMatrix4fv(camera.model_view_pos, 1, GL_TRUE, (GLfloat*) mv);
 
     // Update sun position using rotation angle and translate into eye coordinates
     vec4 sp;
@@ -90,20 +91,20 @@ reshape(int width, int height) {
     glUniformMatrix4fv(world.projection_pos, 1, GL_TRUE, (GLfloat*) p); 
 }
 
-static void get_model_view(mat4 r, worldData const * const w) {
+static void get_model_view(mat4 r, cameraData const * const c) {
     mat4 ROTATE_Z;
-    mat4_rotate_z(ROTATE_Z, w->theta[2]);
+    mat4_rotate_z(ROTATE_Z, c->theta[2]);
 
     mat4 ROTATE_Y;
-    mat4_rotate_y(ROTATE_Y, w->theta[1]);
+    mat4_rotate_y(ROTATE_Y, c->theta[1]);
 
     mat4 ROTATE_X;
-    mat4_rotate_x(ROTATE_X, w->theta[0]);
+    mat4_rotate_x(ROTATE_X, c->theta[0]);
 
     mat4 result1;
     mat4 result2;
 
-    mat4_translate(result1, -w->viewer[0], -w->viewer[1], -w->viewer[2]);
+    mat4_translate(result1, -c->viewer[0], -c->viewer[1], -c->viewer[2]);
     mat4_mult(result2, ROTATE_Z, result1);
     mat4_mult(result1, ROTATE_Y, result2);
     mat4_mult(r, ROTATE_X, result1);
