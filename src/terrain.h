@@ -62,8 +62,8 @@ typedef struct {
     GLfloat viewer[3];
     GLfloat theta[3];
     GLuint model_view_pos;
-    int lastMouseX;
-    int lastMouseY;
+    int last_mouse_x;
+    int last_mouse_y;
 } cameraData;
 
 #endif

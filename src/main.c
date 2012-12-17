@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "display.h"
 #include "keyboard.h"
+#include "mouse.h"
 #include "init.h"
 
 int main(int argc, char* argv[]) {
@@ -30,12 +31,14 @@ int main(int argc, char* argv[]) {
     
     glewInit();
 
-    // Initialize objects
+    // Initializes state for drawing
     init(elevation_file);
     
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutReshapeFunc(reshape);
+    glutMotionFunc(mouse_move);
+    glutMouseFunc(mouse_click);
 
     glutMainLoop();
 
