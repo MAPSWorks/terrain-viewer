@@ -22,6 +22,9 @@ typedef struct vec4 {
     GLfloat w;
 } vec4;
 
+inline
+void vec3_init(vec3 * const v, GLfloat a, GLfloat b, GLfloat c);
+
 inline 
 void vec4_init(vec4 * const v, GLfloat a, GLfloat b, GLfloat c, GLfloat d);
 

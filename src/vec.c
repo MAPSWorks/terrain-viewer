@@ -1,6 +1,13 @@
 #include "vec.h"
 
 inline 
+void vec3_init(vec3 * const v, GLfloat a, GLfloat b, GLfloat c) {
+    v->x = a;
+    v->y = b;
+    v->z = c;
+}
+
+inline 
 void vec4_init(vec4 * const v, GLfloat a, GLfloat b, GLfloat c, GLfloat d) {
     v->x = a;
     v->y = b;

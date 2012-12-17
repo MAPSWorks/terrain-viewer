@@ -12,7 +12,7 @@ cameraData camera;
 
 void
 init_world_data(worldData * const w) {
-    // Size of the (x,z) plane to fit the map in
+    // The length in GL coord of one side of the (x,z) plane
     w->cube_size = 100.0f;
 
     // Wireframe (0=off, 1=on)
@@ -46,6 +46,9 @@ init_camera_data(cameraData * const c, GLfloat cube_size) {
     c->theta[0] = 15.0f;
     c->theta[1] = 180.0f;
     c->theta[2] = 0.0f;
+
+    c->last_mouse_x = -1;
+    c->last_mouse_y = -1;
 }
 
 /**
@@ -130,66 +133,145 @@ make_vertex(vec4 * const v, int x, int z, mapData const * const mData) {
 }
 
 /**
- *  Create the flat normal for the triangular face on the bottom of a map
- *  square (a)
- *     (x, z) +--+ (x+1, z)
- *            |a/|  
- *            |/b|
- *   (x, z+1) +--+ (x+1, z+1)
+ *  Given (x,z) find the normal for (a)   
+ *      + 
+ *    a | b
+ *  +-(x,z)-+ 
+ *    d | c 
+ *      +
  *  @param[out] n  The flat normal
  *  @param[in] x  The x index of the point in the map
  *  @param[in] z  The z index of the point in the map
  *  @param[in] mData  The current map
  */
-void 
-make_normal_top(vec3 * const n, int x, int z, mapData const * const mData) {
-    vec4 vertex1;
-    make_vertex( &vertex1, x+1, z+1, mData );
-    vec4 vertex2;
-    make_vertex( &vertex2, x, z, mData );
+void
+make_normal_top_left(vec3 * const n, int x, int z, mapData const * const mData) {
+    if(x <= 0 || z <= 0) {
+       vec3_init( n, 0.0f, 0.0f, 0.0f );
+       return;
+    }
+    vec4 vertex;
+    make_vertex( &vertex, x, z, mData );
+
     vec4 u;
-    vec4_sub( &u, &vertex1, &vertex2 );
+    vec4 vertex_d;
+    make_vertex( &vertex_d, x-1, z, mData );
+    vec4_sub(&u, &vertex, &vertex_d );
 
-    vec4 v; 
-    make_vertex( &vertex1, x+1, z, mData );
-    make_vertex( &vertex2, x+1, z+1, mData );
-    vec4_sub( &v, &vertex1, &vertex2 );
-
+    vec4 v;
+    make_vertex( &vertex_d, x, z-1, mData );
+    vec4_sub(&v, &vertex_d, &vertex );
+    
     vec3 c;
     vec4_cross( &c, &u, &v );
     vec3_norm( n, &c );
 }
 
 /**
- *  Create the flat normal for the triangular face on the bottom of a map
- *  square (b)
- *     (x, z) +--+ (x+1, z)
- *            |a/|  
- *            |/b|
- *   (x, z+1) +--+ (x+1, z+1)
+ *  Given (x,z) find the normal for (b)   
+ *      + 
+ *    a | b
+ *  +-(x,z)-+ 
+ *    d | c 
+ *      +
  *  @param[out] n  The flat normal
  *  @param[in] x  The x index of the point in the map
  *  @param[in] z  The z index of the point in the map
  *  @param[in] mData  The current map
  */
-void 
-make_normal_bottom(vec3 * const n, int x, int z, mapData const * const mData) {
+void
+make_normal_top_right(vec3 * const n, int x, int z, mapData const * const mData) {
+    if(x >= mData->mapWidth - 1 || z <= 0) {
+       vec3_init( n, 0.0f, 0.0f, 0.0f );
+       return;
+    }
+    vec4 vertex;
+    make_vertex( &vertex, x, z, mData );
+
     vec4 u;
-    vec4 vertex1;
-    vec4 vertex2;
-    make_vertex( &vertex1, x, z+1, mData );
-    make_vertex( &vertex2, x, z, mData );
-    vec4_sub( &u, &vertex1, &vertex2 );
+    vec4 vertex_d;
+    make_vertex( &vertex_d, x, z-1, mData );
+    vec4_sub(&u, &vertex, &vertex_d );
 
-    vec4 v; 
-    make_vertex( &vertex1, x+1, z+1, mData );
-    make_vertex( &vertex2, x, z+1, mData );
-    vec4_sub( &v, &vertex1, &vertex2 );
-
+    vec4 v;
+    make_vertex( &vertex_d, x+1, z, mData );
+    vec4_sub(&v, &vertex_d, &vertex );
+    
     vec3 c;
     vec4_cross( &c, &u, &v );
     vec3_norm( n, &c );
 }
+
+/**
+ *  Given (x,z) find the normal for (c)   
+ *      + 
+ *    a | b
+ *  +-(x,z)-+ 
+ *    d | c 
+ *      +
+ *  @param[out] n  The flat normal
+ *  @param[in] x  The x index of the point in the map
+ *  @param[in] z  The z index of the point in the map
+ *  @param[in] mData  The current map
+ */
+void
+make_normal_bot_right(vec3 * const n, int x, int z, mapData const * const mData) {
+    if(x >= mData->mapWidth - 1 || z >= mData->mapHeight - 1) {
+       vec3_init( n, 0.0f, 0.0f, 0.0f );
+       return;
+    }
+    vec4 vertex;
+    make_vertex( &vertex, x, z, mData );
+
+    vec4 u;
+    vec4 vertex_d;
+    make_vertex( &vertex_d, x+1, z, mData );
+    vec4_sub(&u, &vertex, &vertex_d );
+
+    vec4 v;
+    make_vertex( &vertex_d, x, z+1, mData );
+    vec4_sub(&v, &vertex_d, &vertex );
+    
+    vec3 c;
+    vec4_cross( &c, &u, &v );
+    vec3_norm( n, &c );
+}
+
+/**
+ *  Given (x,z) find the normal for (d)   
+ *      + 
+ *    a | b
+ *  +-(x,z)-+ 
+ *    d | c 
+ *      +
+ *  @param[out] n  The flat normal
+ *  @param[in] x  The x index of the point in the map
+ *  @param[in] z  The z index of the point in the map
+ *  @param[in] mData  The current map
+ */
+void
+make_normal_bot_left(vec3 * const n, int x, int z, mapData const * const mData) {
+    if(x <= 0 || z >= mData->mapHeight - 1) {
+       vec3_init( n, 0.0f, 0.0f, 0.0f );
+       return;
+    }
+    vec4 vertex;
+    make_vertex( &vertex, x, z, mData );
+
+    vec4 u;
+    vec4 vertex_d;
+    make_vertex( &vertex_d, x, z+1, mData );
+    vec4_sub(&u, &vertex, &vertex_d );
+
+    vec4 v;
+    make_vertex( &vertex_d, x-1, z, mData );
+    vec4_sub(&v, &vertex_d, &vertex );
+    
+    vec3 c;
+    vec4_cross( &c, &u, &v );
+    vec3_norm( n, &c );
+}
+
 
 /**
  *  Return the normal for a given point by averaging the flat normals of 
@@ -208,29 +290,16 @@ get_average_normal(vec3 * const v,
     vec3 n2 = { 0.0f, 0.0f, 0.0f };
     vec3 n3 = { 0.0f, 0.0f, 0.0f };
     vec3 n4 = { 0.0f, 0.0f, 0.0f };
-    if(x > 0){
-        if(z < mData->mapHeight - 1) {
-            make_normal_top(&n1,x-1,z,mData);
-        }
-        if(z > 0 && z < mData->mapHeight - 1) {
-            make_normal_top(&n2,x-1,z,mData);
-        }
-    }
-    if(x < mData->mapWidth - 2){
-        if(z < mData->mapHeight - 1) {
-            make_normal_top(&n3,x,z,mData);
-        }
-        if(z > 0 && z < mData->mapHeight) {
-            make_normal_bottom(&n4,x,z-1,mData);
-        }
-    }
+    make_normal_top_left( &n1, x, z, mData );
+    make_normal_top_right( &n2, x, z, mData );
+    make_normal_bot_left( &n3, x, z, mData );
+    make_normal_bot_right( &n4, x, z, mData );
 
-    vec3 temp;
-    vec3_add( &temp, &n3, &n4 );
-    vec3_add( v , &n2, &temp);
-    vec3_add( &temp, &n1, v);
-
-    vec3_norm( v, &temp );
+    vec3 sum;
+    vec3_add( &sum, &n3, &n4 );
+    vec3_add( &sum, &n2, &sum );
+    vec3_add( &sum, &n1, &sum );
+    vec3_norm( v, &sum );
 }
 
 /**
